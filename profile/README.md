@@ -2,11 +2,11 @@
 
 # SWEOrchestrAI
 
-### AI Engineering System for orchestrating software projects, agents, roadmaps, skills, and local/cloud development workflows.
+### Cloud-managed software delivery. Locally executed AI engineering.
 
-SWEOrchestrAI is an experimental software engineering orchestration platform designed to turn AI-assisted development into a structured, repeatable, and project-aware workflow.
+SWEOrchestrAI is a hybrid local/cloud AI Project Manager for software engineering workflows.
 
-Instead of using AI tools as isolated chat-based assistants, SWEOrchestrAI provides a system where projects have persistent context, reusable engineering skills, roadmaps, local execution capabilities, cloud synchronization, and clear links between product planning and code execution.
+It combines cloud-based project management with local AI agent execution, repository-aware automation, diagrams, design workflows, MCP integrations, and approval-gated coding operations.
 
 </div>
 
@@ -14,364 +14,127 @@ Instead of using AI tools as isolated chat-based assistants, SWEOrchestrAI provi
 
 ## What is SWEOrchestrAI?
 
-SWEOrchestrAI is a portfolio-grade AI engineering system built around one main idea:
+SWEOrchestrAI is an experimental AI engineering system designed to make AI-assisted software delivery more structured, traceable, and project-aware.
 
-> AI should not only generate code.
-> It should understand the project, follow engineering workflows, respect architectural context, and help execute software work in a structured way.
+Instead of treating AI tools as isolated chat assistants, SWEOrchestrAI organizes software work around persistent project context, cloud project visibility, local execution, reusable engineering workflows, and explicit approval gates.
 
-The system is designed to help developers and technical teams manage software projects through:
-
-* Persistent project context.
-* Roadmap-driven execution.
-* Reusable AI engineering skills.
-* Local-first development workflows.
-* Cloud-based project visibility.
-* GitHub and repository integrations.
-* AI provider abstraction.
-* Documentation, architecture decisions, and execution history.
+The project is currently in MVP architecture and foundation planning.
 
 ---
 
-## Core Concept
+## Core Architecture
 
-SWEOrchestrAI acts as an orchestration layer between:
+SWEOrchestrAI is split into two main planes:
 
-* The developer.
-* The project repository.
-* Local development tools.
-* AI providers and coding agents.
-* Cloud project management services.
-* GitHub repositories and engineering workflows.
+| Plane | Purpose |
+|---|---|
+| Local Execution Plane | Runs local coding agents, provider adapters, MCP tools, repository operations, and approval-gated commands through the desktop app and Go local service. |
+| Cloud Control Plane | Manages projects, users, requirements, backlog, diagrams, design portfolios, execution history, artifacts, and sync state. |
 
 ```mermaid
-flowchart LR
-    Developer["Developer"]
+flowchart TB
+    subgraph Local["Local Execution Plane"]
+        LocalApp["local-app<br/>Electron + React"]
+        LocalService["local-service<br/>Go"]
+        Providers["Local Providers<br/>Claude Code / Codex CLI / Ollama / OpenCode"]
+        Tools["MCP + Tool Integrations<br/>Figma / Git / Filesystem / Test Runners"]
+        Repos["Local Repositories"]
 
-    subgraph Local["Local Environment"]
-        LocalApp["Local App<br/>Electron + React"]
-        LocalRuntime["Local Runtime<br/>Go Service"]
-        Project["Target Project<br/>Codebase + AI Context"]
+        LocalApp -->|REST + WebSocket over localhost| LocalService
+        LocalService --> Providers
+        LocalService --> Tools
+        LocalService --> Repos
     end
 
-    subgraph Cloud["Cloud Platform"]
-        CloudWeb["Cloud Web App"]
-        CloudAPI["Cloud API"]
-        DB["Database"]
+    subgraph Cloud["Cloud Control Plane"]
+        Web["web<br/>React"]
+        API["api<br/>Spring Boot Monolith"]
+        DB["Cloud DBs<br/>Project State"]
+        Storage["Object Storage<br/>Images / Documents / Diagrams"]
+
+        Web --> API
+        API --> DB
+        API --> Storage
     end
 
-    subgraph External["External Systems"]
-        GitHub["GitHub"]
-        AIProviders["AI Providers / Coding Agents"]
-        MCPs["MCP Servers / Tools"]
-    end
-
-    Developer --> LocalApp
-    Developer --> CloudWeb
-
-    LocalApp --> LocalRuntime
-    LocalRuntime --> Project
-    LocalRuntime --> AIProviders
-    LocalRuntime --> MCPs
-    LocalRuntime <--> CloudAPI
-
-    CloudWeb --> CloudAPI
-    CloudAPI --> DB
-    CloudAPI --> GitHub
-    CloudAPI --> AIProviders
+    LocalService -->|Authenticated Sync APIs| API
 ```
 
 ---
 
-## Repository Structure
+## Repositories
 
-SWEOrchestrAI is divided into five repositories, each with a clear responsibility.
-
-| Repository                                                                               | Purpose                                                                                                               |
-| ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [`sweorchestrai-overview`](https://github.com/YOUR_ORG/sweorchestrai-overview)           | Documentation hub, architecture, roadmap, diagrams, technical decisions, screenshots, and portfolio presentation.     |
-| [`sweorchestrai-local-app`](https://github.com/YOUR_ORG/sweorchestrai-local-app)         | Desktop application built with Electron + React. Provides the local user interface.                                   |
-| [`sweorchestrai-local-runtime`](https://github.com/YOUR_ORG/sweorchestrai-local-runtime) | Local runtime service built in Go. Handles project access, local execution, tool communication, and AI orchestration. |
-| [`sweorchestrai-cloud-web`](https://github.com/YOUR_ORG/sweorchestrai-cloud-web)         | Cloud web frontend for dashboards, project visibility, roadmap management, and configuration.                         |
-| [`sweorchestrai-cloud-api`](https://github.com/YOUR_ORG/sweorchestrai-cloud-api)         | Cloud backend API and database layer. Acts as the contract center of the system.                                      |
-
----
-
-## Main Components
-
-### Local App
-
-The local application provides a desktop interface for interacting with projects, roadmaps, skills, local executions, and AI-assisted workflows.
-
-Planned responsibilities:
-
-* Project selection and workspace management.
-* Local task execution interface.
-* Skill selection and execution history.
-* Local runtime status and configuration.
-* Connection with cloud synchronization features.
-
-Main technologies:
-
-* Electron
-* React
-* TypeScript
-* Vite
-* Modern frontend tooling
+| Repository | Purpose | Stack |
+|---|---|---|
+| [`overview`](https://github.com/SWEOrchestrAI/overview) | Documentation, architecture, roadmap, ADRs, contracts, diagrams, and portfolio hub. | Markdown |
+| [`api`](https://github.com/SWEOrchestrAI/api) | Cloud backend monolith for auth, persistence, sync, artifacts, project logic, and APIs. | Spring Boot, Kotlin/Java |
+| [`web`](https://github.com/SWEOrchestrAI/web) | Cloud web app for project management, visibility, diagrams, design stages, and execution history. | React, TypeScript |
+| [`local-app`](https://github.com/SWEOrchestrAI/local-app) | Local desktop UI for provider configuration, workspaces, runs, logs, and approvals. | Electron, React, TypeScript |
+| [`local-service`](https://github.com/SWEOrchestrAI/local-service) | Go local execution service that connects to providers, MCP tools, local repos, and syncs with cloud. | Go |
+| [`.github`](https://github.com/SWEOrchestrAI/.github) | Organization profile and public presentation. | Markdown |
 
 ---
 
-### Local Runtime
+## MVP Scope
 
-The local runtime is the bridge between the desktop app, the local machine, target repositories, MCP servers, and AI providers.
+The first MVP focuses on proving the hybrid local/cloud workflow:
 
-Planned responsibilities:
-
-* Read and manage local project context.
-* Execute local commands safely.
-* Communicate with AI providers or coding agents.
-* Interact with MCP servers.
-* Expose a local API to the desktop app.
-* Synchronize relevant metadata with the cloud API.
-
-Main technologies:
-
-* Go
-* Local HTTP / RPC-style communication
-* File system access
-* Process execution
-* Tool and provider abstraction
+- cloud-managed project state,
+- local execution through `local-service`,
+- Electron desktop app for local runs and approvals,
+- cloud web app for project visibility,
+- provider-agnostic local execution,
+- REST + WebSocket communication between `local-app` and `local-service`,
+- execution history and sync metadata,
+- diagrams and design stage as first-class project areas,
+- portfolio-grade architecture documentation.
 
 ---
 
-### Cloud Web
+## Key Principles
 
-The cloud web application provides centralized visibility over projects, roadmaps, skills, execution history, and system configuration.
-
-Planned responsibilities:
-
-* Project dashboards.
-* Roadmap and milestone visualization.
-* Skill catalog management.
-* Execution tracking.
-* Team/project configuration.
-* Portfolio-level product demonstration.
-
-Main technologies:
-
-* React
-* TypeScript
-* Vite or similar frontend tooling
-* API-driven architecture
+- Cloud-managed software delivery.
+- Locally executed AI engineering.
+- Provider-agnostic local execution.
+- Approval-gated local operations.
+- Project context over one-off prompts.
+- Clear repository boundaries.
+- Documentation as part of the product.
 
 ---
 
-### Cloud API
+## Documentation
 
-The cloud API acts as the contract center of the system.
+The full architecture, roadmap, ADRs, contracts, requirements, and diagrams are maintained in the [`overview`](https://github.com/SWEOrchestrAI/overview) repository.
 
-Planned responsibilities:
+Start there for:
 
-* Project metadata.
-* Roadmaps and milestones.
-* Skills and workflows.
-* Execution history.
-* User and workspace management.
-* Synchronization contracts.
-* GitHub integration contracts.
-* Cloud persistence.
-
-Potential technologies:
-
-* Java / Kotlin / Node.js backend stack
-* PostgreSQL
-* Redis where needed
-* Docker
-* REST APIs
-* OpenAPI documentation
-* CI/CD pipelines
-
----
-
-### Overview Repository
-
-The overview repository is the main documentation and portfolio hub.
-
-It contains:
-
-* Product explanation.
-* Architecture diagrams.
-* Repository map.
-* Technical decisions.
-* MVP roadmap.
-* Demo screenshots.
-* System walkthroughs.
-* Skills documentation.
-* MCP integration notes.
-
----
-
-## Engineering Skills
-
-SWEOrchestrAI is built around reusable engineering skills.
-
-A skill defines a repeatable workflow that an AI agent can follow when assisting with software engineering work.
-
-Examples:
-
-| Skill                 | Purpose                                                                                |
-| --------------------- | -------------------------------------------------------------------------------------- |
-| Backlog Management    | Convert ideas, issues, and product goals into structured backlog items.                |
-| Feature Development   | Guide the implementation of new features from context gathering to validation.         |
-| Bug Investigation     | Analyze bugs, reproduce issues, inspect probable causes, and propose fixes.            |
-| Code Review           | Review changes for correctness, maintainability, security, and architecture alignment. |
-| Documentation         | Generate or improve technical documentation.                                           |
-| Refactoring           | Improve code structure without changing external behavior.                             |
-| Security Audit        | Inspect code and architecture for security risks.                                      |
-| Infrastructure Design | Help design deployment, cloud, and infrastructure components.                          |
-| Performance Analysis  | Identify bottlenecks and suggest improvements.                                         |
-
----
-
-## Project Context Strategy
-
-SWEOrchestrAI is designed to support structured project context.
-
-A target project may include an AI-readable context folder, for example:
-
-```txt
-.ai/
-├── project.md
-├── architecture.md
-├── roadmap.md
-├── standards.md
-├── backlog.md
-├── decisions/
-├── skills/
-└── context/
-```
-
-The goal is to make AI-assisted development more reliable by giving agents access to explicit project knowledge instead of relying only on chat history.
-
----
-
-## Local + Cloud Workflow
-
-SWEOrchestrAI follows a hybrid local/cloud approach.
-
-```mermaid
-sequenceDiagram
-    participant User as Developer
-    participant App as Local App
-    participant Runtime as Local Runtime
-    participant Project as Local Project
-    participant AI as AI Provider / Agent
-    participant API as Cloud API
-
-    User->>App: Select project and skill
-    App->>Runtime: Start task execution
-    Runtime->>Project: Read project context
-    Runtime->>AI: Send structured task context
-    AI-->>Runtime: Return proposed actions
-    Runtime->>Project: Apply or stage changes
-    Runtime->>API: Sync execution metadata
-    API-->>App: Return updated project state
-```
-
----
-
-## Tech Stack
-
-The system is intentionally polyglot, using different technologies where they make the most sense.
-
-| Area                  | Technologies                               |
-| --------------------- | ------------------------------------------ |
-| Desktop App           | Electron, React, TypeScript                |
-| Local Runtime         | Go                                         |
-| Cloud Frontend        | React, TypeScript                          |
-| Cloud Backend         | Java/Kotlin or Node.js, REST APIs, OpenAPI |
-| Database              | PostgreSQL                                 |
-| Cache / Async Support | Redis, queues where needed                 |
-| DevOps                | Docker, Docker Compose, GitHub Actions     |
-| Integrations          | GitHub, MCP servers, AI providers          |
-| Documentation         | Markdown, Mermaid, ADRs                    |
-
----
-
-## Architecture Principles
-
-SWEOrchestrAI is designed around the following principles:
-
-* **Local-first where execution matters.**
-* **Cloud-first where visibility and coordination matter.**
-* **Provider-agnostic AI execution.**
-* **Explicit project context over implicit chat memory.**
-* **Reusable engineering workflows over one-off prompts.**
-* **Clear contracts between repositories.**
-* **Documentation as part of the product.**
-* **Portfolio-quality architecture and implementation.**
-
----
-
-## MVP Goals
-
-The first MVP aims to prove the full end-to-end flow:
-
-1. Configure a local software project.
-2. Define or load project context.
-3. Select an engineering skill.
-4. Execute an AI-assisted task through the local runtime.
-5. Track execution results.
-6. Synchronize metadata with the cloud API.
-7. Visualize project state through the cloud web app.
-8. Document the architecture and decisions in the overview repository.
+- product vision,
+- architecture overview,
+- repository responsibilities,
+- MVP roadmap,
+- contracts,
+- requirements,
+- ADRs,
+- security model,
+- diagram and design-stage documentation.
 
 ---
 
 ## Current Status
 
-SWEOrchestrAI is currently in early MVP development.
+SWEOrchestrAI is currently in MVP architecture and foundation planning.
 
-Initial focus:
+Current focus:
 
-* Repository setup.
-* Architecture documentation.
-* MVP roadmap definition.
-* Local runtime design.
-* Desktop app foundation.
-* Cloud API contracts.
-* Skills catalog definition.
-* Portfolio-ready documentation.
-
----
-
-## Why This Project Matters
-
-This project explores several real-world software engineering concerns:
-
-* AI-assisted development.
-* Developer tooling.
-* Local/cloud hybrid architecture.
-* Desktop application architecture.
-* Backend API design.
-* Cross-repository system design.
-* Project orchestration.
-* Engineering workflow automation.
-* Technical documentation.
-* Architecture decision records.
-* Portfolio-grade product presentation.
-
-For portfolio purposes, SWEOrchestrAI demonstrates not only coding ability, but also system design, product thinking, architectural decision-making, documentation quality, and the ability to structure a multi-repository software platform.
+- documentation and architecture source of truth,
+- repository contract definition,
+- implementation repo README expansion,
+- `local-service` Go service foundation,
+- mock local execution run with WebSocket logs and approval gates.
 
 ---
 
 ## Author
 
-Built as a personal software engineering portfolio project focused on AI engineering systems, developer tooling, local/cloud architecture, and modern software delivery workflows.
-
----
-
-## License
-
-Each repository may define its own license depending on its purpose and distribution model.
-
-The overview and documentation repositories are intended mainly for product explanation, architecture, diagrams, and portfolio presentation.
+Built as a personal software engineering portfolio project focused on AI engineering systems, developer tooling, local/cloud architecture, project orchestration, and modern software delivery workflows.
